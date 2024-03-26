@@ -1,0 +1,60 @@
+<template>
+  <div>
+    <div v-for="unit in units" :key="unit.unit_id">
+      <h2>{{ unit.unit_name }}</h2>
+      <ul>
+        <li v-for="schedule in unit.jadwal" :key="schedule.doctor_id">
+          <div>{{ schedule.doctor }}</div>
+          <div>Start: {{ schedule.start }}</div>
+          <div>End: {{ schedule.end }}</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      units: [],
+    };
+  },
+  mounted() {
+    // Mengambil data dari API menggunakan Axios
+    axios
+      .get("http://10.126.0.1/api/api/doctor_schedule_today/t/?key=1234576890")
+      .then((response) => {
+        this.units = this.processData(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  },
+  methods: {
+    processData(data) {
+      // Proses data dari API untuk mengelompokkan dokter berdasarkan unit
+      const unitsMap = {};
+      data.forEach((schedule) => {
+        const unitId = schedule.unit_id;
+        if (!unitsMap[unitId]) {
+          unitsMap[unitId] = {
+            unit_id: unitId,
+            unit_name: schedule.unit_name,
+            jadwal: [],
+          };
+        }
+        unitsMap[unitId].jadwal.push({
+          doctor_id: schedule.doctor_id,
+          doctor: schedule.doctor_name,
+          start: schedule.starts,
+          end: schedule.ends,
+        });
+      });
+      // Konversi objek unit menjadi array
+      return Object.values(unitsMap);
+    },
+  },
+};
+</script>
