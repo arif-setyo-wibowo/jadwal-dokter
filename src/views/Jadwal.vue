@@ -77,9 +77,7 @@ export default {
   methods: {
     fetchData() {
       axios
-        .get(
-          "http://10.126.0.1/api/api/doctor_schedule_today/t/?key=1234576890"
-        )
+        .get("/api/doctor_schedule_today/t/?key=1234576890")
         .then((response) => {
           this.transformData(response.data.data);
         })
@@ -102,7 +100,12 @@ export default {
 
         unitsMap[unitId].jadwal.push({
           doctor_id: schedule.doctor_id,
-          doctor: schedule.doctor_name,
+          doctor:
+            schedule.employee_ft +
+            " " +
+            schedule.doctor_name +
+            " " +
+            schedule.employee_bt,
           start: schedule.starts,
           end: schedule.ends,
         });
